@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"BloomFilter/pkg"
+	"BloomFilter/filter"
 	"fmt"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +10,7 @@ var rootCmd = &cobra.Command{
 	Use:   "bloom",
 	Short: "Bloom фильтр CLI",
 	Run: func(cmd *cobra.Command, args []string) {
-		filter := pkg.NewBloomFilter(1000)
+		filter := filter.NewBloomFilter(1000, 10)
 		filter.Add("mango")
 		filter.Add("banana")
 		fmt.Println("Exists mango: ", filter.Exists("mango"))

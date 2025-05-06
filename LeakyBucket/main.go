@@ -1,7 +1,7 @@
 package main
 
 import (
-	"BloomFilter/pkg"
+	"BloomFilter/filter"
 	"errors"
 	"fmt"
 	"sync"
@@ -12,7 +12,7 @@ type LeakyBucket struct {
 	capacity int
 	rate     int
 	interval time.Duration
-	bf       *pkg.BloomFilter
+	bf       *filter.BloomFilter
 	mu       sync.Mutex
 	tokens   int
 
@@ -24,7 +24,7 @@ func NewLeakyBucket(capacity, rate int, interval time.Duration) *LeakyBucket {
 		capacity: capacity,
 		rate:     rate,
 		interval: interval,
-		bf:       pkg.NewBloomFilter(1000),
+		bf:       filter.NewBloomFilter(1000, 10),
 		tokens:   0,
 		stopChan: make(chan struct{}),
 	}
@@ -63,6 +63,7 @@ func (lb *LeakyBucket) AllowRequest(id string) error {
 		lb.bf.Add(id)
 	} else {
 		fmt.Println("Request", id, "is already allowed")
+		return nil
 	}
 
 	if lb.tokens < lb.capacity {
@@ -82,7 +83,8 @@ func main() {
 	for i := 0; i < 10; i++ {
 		id := fmt.Sprintf("req-%d", i)
 		err := lb.AllowRequest(id)
-		lb.AllowRequest(id)
+
+		lb.AllowRequest(id) // только для демонстрации проверки одинаковых запросов
 
 		if err != nil {
 			fmt.Println("Request", id, "blocked:", err)
